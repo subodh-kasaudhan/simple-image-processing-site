@@ -1,167 +1,141 @@
 <!DOCTYPE html>
 
 <html>
-  <head>
-    <title>Simple image editor</title>
-    <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
-    <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
-    <script type="text/javascript" src="assign4.js"></script>
-    <style>
-      .center {
-        position: absolute;
-        left: 31.3%;
-        right: 31.3%;
-        /* to: 50%; */
-      }
-      .pleasebold{
-        font-weight: 700;
-      }
-      .shiftme{
-        display: inline-block;
-        padding-left: 5px;
-      }
-      .rounded-button {
-        display: inline-block;
-        padding: 10px 20px;
-        border: 2px solid #0074D9; /* Blue border color */
-        background-color: white;
-        color: #0074D9; /* Blue text color */
-        border-radius: 20px; /* Adjust the border radius to control the button's roundness */
-        cursor: pointer;
-        transition: background-color 0.3s; /* Smooth color transition */
-      }
 
-      .rounded-button:hover {
-        background-color: #2ECC71; /* Green background color on hover */
-        color: white; /* White text color on hover */
-      }
-      div {
-        /* width: 500; */
-        /* height: 200; */
-        border: 1px solid black;
-        background-color: #fde4f2;
-      }
-      p {
-        padding-left: 15px;
-        display: inline-block;
-        font-size: medium;
-        margin-top: -10px;
-      }
-      input{
-        display: inline-block;
-        /* width: 250px;  */
-        /* padding-left: 105px; */
-      }
-      form{        
-        /* position: relative; */
-        left: 5px;
-        display: inline-block;
-      }
-      label{
-        display: inline-block;
-      }
-      /* sliders{
-        padding-left: 15px;
-      } */
-    </style>
-  </head>
+<head>
+  <title>Simple image editor</title>
+  <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
+  <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
+  <script type="text/javascript" src="assign4.js"></script>
+  <link rel="stylesheet" href="index.css">
+</head>
 
-  <body class="center" onload="webGLStart();">
-    <div>
-      <canvas id="assign4" width="550" height="550"></canvas>
-      <p> Select Background Inage:      
-      <input type="file" id="imageInput1" accept="image/*" />
-      </p> 
-      <p> Select Foreground Inage:      
-      <input type="file" id="imageInput2" accept="image/*" />
-      </p>
-      <br>
-      <p class="pleasebold">Image Mode:
-        <form name="formA">
+<body onload="webGLStart();">
+  <div class="bottom-fixed">
+    <div class="center">
+      <div class="outer-div">
+        <h1 style="text-align: center;">Image Processing Site</h1>
+        <div class="info-button" id="infoBtn">i</div>
+        <div class="info-popup" id="infoPopup">
+          This website allows you to upload a background and a foreground image, blend them using alpha blending, and apply
+          various filters such as grayscale, sepia, saturate, and invert. You can also adjust brightness and contrast, apply
+          effects like smooth, sharpen, gradient, and Laplacian on the background image, and download or reset the canvas. Use
+          the sliders and radio buttons to modify the image, and click the 'Save' button to download the final result.
+        </div>
+
+        <canvas id="assign4" width="500" height="500" style="margin-left: 2px;"></canvas>
+        <div class="one-row">
+          <div class="input-column">
+            <p> Select Background Inage:
+              <input type="file" id="imageInput1" accept="image/*" />
+            </p>
+            <p> Select Foreground Inage:
+              <input type="file" id="imageInput2" accept="image/*" />
+            </p>
+            <div class="image-mode-row">
+              <span class="pleasebold">Image Mode:</span>
+              <form name="formA" class="image-mode-options-row">
+                <label>
+                  <input type="radio" name="myradio" value="A" /> Background Only
+                </label>
+                <label>
+                  <input type="radio" name="myradio" value="B" /> Alpha Blended
+                </label>
+              </form>
+            </div>
+          </div>
+          <div class="button-column">
+            <button class="block-button-sample" id="downloadSample">Download sample files</button>
+            <!-- <button class="rounded-button-reset" id="reset-images">Reset</button> -->
+          </div>
+        </div>
+        <p>
+        <form name="formB">
           <label>
-            <input type="radio" name="myradio" value="A"/> Background Only
+            <input type="radio" name="myradio" value="1" /> GreyScale
           </label>
           <label>
-            <input type="radio" name="myradio" value="B"/> Alpha Blended
+            <input type="radio" name="myradio" value="2" /> Sepia
+          </label>
+          <label>
+            <input type="radio" name="myradio" value="3"/> Saturate
+          </label>
+          <label>
+            <input type="radio" name="myradio" value="4"/> Invert
           </label>
         </form>
-      </p>
-      <br>
-        <p>
-          <form name="formB">
-            <label>
-              <input type="radio" name="myradio" value="1"/> GreyScale
-            </label>
-            <label>
-              <input type="radio" name="myradio" value="2"/> Sepia
-            </label>
-            <!-- <label>
-              <input type="radio" name="myradio" value="0"/> None
-            </label> -->
-          </form>
         </p>
-          <button id="myBtn">Reset</button>        
+        <button class="rounded-button-reset" id="myBtn">Reset</button>
         <p>
           <br>
-      <span
-        style="font-family: 'Times New Roman', Times, serif; font-size: larger;"
-      >
-        Contrast:
-      </span>
-      <span class="sliders" >
-        <input
-          type="range"
-          style="width: 300px"
-          min="-90"
-          max="0.0"
-          value="-50"
-          class="slider1"
-          id="myRange1"
-        />
-      </span>
-      <br>
-      <span
-        style="font-family: 'Times New Roman', Times, serif; font-size: larger;"
-      >
-        Brightness:
-      </span>
-      <span class="sliders" >
-        <input
-          type="range"
-          style="width: 300px"
-          min="-50"
-          max="50.0"
-          value="0"
-          class="slider2"
-          id="myRange2"
-        />
-      </span>
-      <p>
+          <span style="font-family: 'Times New Roman', Times, serif; font-size: larger;">
+            Contrast:
+          </span>
+          <span class="sliders">
+            <input type="range" style="width: 300px" min="-90" max="0.0" value="-50" class="slider1" id="myRange1" />
+          </span>
+          <br>
+          <span style="font-family: 'Times New Roman', Times, serif; font-size: larger;">
+            Brightness:
+          </span>
+          <span class="sliders">
+            <input type="range" style="width: 300px" min="-50" max="50.0" value="0" class="slider2" id="myRange2" />
+          </span>
+        </p>
+        <div>
+          <p>
           <form name="formC">
             <label>
-              <input type="radio" name="myradio" value="1"/> Smooth
+              <input type="radio" name="myradio" value="1" /> Smooth
             </label>
             <label>
-              <input type="radio" name="myradio" value="2"/> Sharpen
+              <input type="radio" name="myradio" value="2" /> Sharpen
             </label>
             <label>
-              <input type="radio" name="myradio" value="3"/> Gradient
+              <input type="radio" name="myradio" value="3" /> Gradient
             </label>
             <label>
-              <input type="radio" name="myradio" value="4"/> Laplacian
+              <input type="radio" name="myradio" value="4" /> Laplacian
             </label>
           </form>
-        </p>
-          <button id="myBtn2">Reset</button>
-    </p>
-    <br>
-    <p>
-      <button class="rounded-button" id="reset" style="
-        margin-top: 10px;">Reset Scene</button>
-    </p>
-    <p>
-      <button class="rounded-button" id="save">Save screenshot</button>
-    </p>
+          </p>
+          <button class="rounded-button-reset" id="myBtn2">Reset</button>
+        </div>
+        <div class="reset-save-div">
+          <p>
+            <button class="rounded-button-reset-all" id="reset">Reset Settings</button>
+          </p>
+          <p>
+            <button class="rounded-button" id="save">Save Canvas</button>
+          </p>
+        </div>
+      </div>
     </div>
-  </body>
+    <footer class="footer-strip">
+      &copy; 2023 Subodh Kumar Kasaudhan. All rights reserved.
+    </footer>
+  </div>
+</body>
+
+<script>
+  const infoBtn = document.getElementById('infoBtn');
+  const infoPopup = document.getElementById('infoPopup');
+
+  infoBtn.addEventListener('click', (event) => {
+    event.stopPropagation(); // Prevent click from bubbling
+    infoPopup.style.display = infoPopup.style.display === 'block' ? 'none' : 'block';
+  });
+
+  // Hide popup if user clicks outside
+  document.addEventListener('click', () => {
+    infoPopup.style.display = 'none';
+  });
+
+  // Prevent closing popup when clicking on the popup itself
+  infoPopup.addEventListener('click', (event) => {
+    event.stopPropagation();
+  });
+</script>
+
+
 </html>

@@ -1,0 +1,297 @@
+  :root {
+    --bg-color: #a6c1fb;
+  }
+
+  .center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+    position: relative;
+
+    left: 34%;
+    right: 34%;
+    width: fit-content;
+    max-width: 504px;
+    /* to: 50%; */
+  }
+
+  .pleasebold {
+    /* margin-top: 5px; */
+    font-weight: 700;
+    width: 100px;
+    display: inline-block !important;
+  }
+
+  .shiftme {
+    display: inline-block;
+    padding-left: 5px;
+  }
+
+  .rounded-button {
+    display: inline-block;
+    margin-top: 25px;
+    padding: 10px 20px;
+    border: 2px solid rgb(1, 158, 1);
+    /* Blue border color */
+    background-color: white;
+    color: green;
+    /* Blue text color */
+    border-radius: 20px;
+    /* Adjust the border radius to control the button's roundness */
+    cursor: pointer;
+    transition: background-color 0.3s;
+    /* Smooth color transition */
+  }
+
+  .rounded-button:hover {
+    background-color: #2ECC71;
+    /* Green background color on hover */
+    color: white;
+    /* White text color on hover */
+  }
+
+    .rounded-button-reset-all {
+    display: inline-block;
+    margin-top: 25px;
+    padding: 10px 20px;
+    border: 2px solid rgb(143, 3, 3);
+    /* Blue border color */
+    background-color: white;
+    color: rgb(132, 7, 7);
+    /* Blue text color */
+    border-radius: 20px;
+    /* Adjust the border radius to control the button's roundness */
+    cursor: pointer;
+    transition: background-color 0.3s;
+    /* Smooth color transition */
+  }
+
+  .rounded-button-reset-all:hover {
+    background-color: #de311e;
+    /* Green background color on hover */
+    color: white;
+    /* White text color on hover */
+  }
+
+
+  .rounded-button-reset {
+    display: inline-block;
+    padding: 5px 10px;
+    border: 2px solid rgb(143, 3, 3);
+    /* margin-right: 100px; */
+    /* Blue border color */
+    background-color: white;
+    color: rgb(132, 7, 7);
+    /* Blue text color */
+    border-radius: 20px;
+    /* Adjust the border radius to control the button's roundness */
+    cursor: pointer;
+    transition: background-color 0.3s;
+    /* Smooth color transition */
+  }
+
+  .rounded-button-reset:hover {
+    background-color: #de311e;
+    /* Green background color on hover */
+    color: white;
+    /* White text color on hover */
+  }
+
+  .block-button-sample {
+    display: inline-block;
+    padding: 5px 10px;
+    border: 2px solid rgb(187, 14, 187);
+    /* Blue border color */
+    background-color: white;
+    color: rgb(182, 12, 182);
+    /* Blue text color */
+    border-radius: 10px;
+    /* Adjust the border radius to control the button's roundness */
+    cursor: pointer;
+    transition: background-color 0.3s;
+    /* Smooth color transition */
+  }
+
+  .block-button-sample:hover {
+    background-color: rgb(209, 73, 209);
+    /* Green background color on hover */
+    color: white;
+    /* White text color on hover */
+  }
+
+  div {
+    /* width: 500; */
+    /* height: 200; */
+    background-color: var(--bg-color);
+  }
+
+  p {
+    padding-left: 15px;
+    display: inline-block;
+    font-size: medium;
+    margin-top: -10px;
+  }
+
+  input {
+    display: inline-block;
+    /* width: 250px;  */
+    /* padding-left: 105px; */
+  }
+
+  form {
+    /* position: relative; */
+    left: 5px;
+    display: inline-block;
+  }
+
+  label {
+    display: inline-block;
+  }
+
+  .image-mode-row {
+    display: flex;
+    flex-direction: row;
+    align-items: top;
+    padding-left: 15px;
+    /* margin: 5px 0; */
+  }
+
+  .image-mode-options-row {
+    display: flex;
+    width: 260px;
+    align-items: left;
+    /* gap: 15px; */
+    /* flex-direction: row; */
+    /* align-items: left; */
+    /* padding-left: 15px; */
+    /* margin: 5px 0; */
+  }
+
+  .one-row {
+    display: flex;
+    /* align-items: flex-start; */
+    /* gap: 20px; */
+    margin-bottom: 5px;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    padding-bottom: 5px;
+    margin-top: -4px;
+  }
+
+  .input-column {
+    display: flex;
+    flex-direction: column;
+    width: 390px;
+  }
+
+  .input-column p {
+    margin: 5px 0;
+    width: 500px;
+  }
+
+  .button-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 130px;
+    margin-right: 10px;
+  }
+
+  .outer-div {
+    border: 1px solid black;
+    width: 100%;
+    max-width: 650px;
+    background-color: var(--bg-color);;
+  }
+
+  .reset-save-div {
+    border: 1px solid black;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+  }
+
+  .info-button {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background-color: #0074D9;
+  color: white;
+  font-weight: bold;
+  font-family: Arial, sans-serif;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  text-align: center;
+  cursor: pointer;
+  line-height: 25px;
+  z-index: 1000;
+}
+
+.info-button:hover {
+  background-color: #005fa3;
+}
+
+.info-popup {
+  display: none;
+  position: absolute;
+  top: 40px;
+  left: 420px;
+  width: 280px;
+  padding: 10px;
+  background-color: #dec3e0;
+  color: #333;
+  border: 1px solid #aaa;
+  border-radius: 8px;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  z-index: 999;
+}
+.footer-strip {
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  color: #444;
+  padding: 8px 0;
+  background-color: #ececec;
+  border-top: 1px solid #ccc;
+  position: relative;
+}
+.item {
+  position: absolute;
+  margin-bottom: 0px;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+}
+.bottom-fixed {
+  background-color: white;
+  height: 100%;
+}
+/* html, body {
+  height: 100%;
+}
+body {
+  display: flex;
+  flex-direction: column;
+}
+.outer-div {
+  flex: 1;
+} */
+
+  /* span {
+    margin-bottom: 15px;
+  } */
+  /* sliders{
+    padding-left: 15px;
+  } */

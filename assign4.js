@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////
-// A WebGL program to show texture mapping on a sphere..
+// A WebGL program to do image processing operations on images..
 
 var gl;
 var canvas;
@@ -45,7 +45,7 @@ var spIndicies = [];
 // var spNormals = [];
 var spTexCoords = [];
 
-var sampleTexture;
+// var sampleTexture;
 var foregroundImage = "";
 var backgroundImage = "";
 
@@ -209,6 +209,17 @@ void main() {
     float sepiaB = 0.272*textureColor.x + 0.534*textureColor.y + 0.131*textureColor.z;
     textureColor = vec4(sepiaR, sepiaG, sepiaB, 1.0);
   }
+  else if (effects == 3.0) {
+      // Saturate
+      float intensity = dot(textureColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+      float strength = 3.0;
+      vec3 saturated = mix(vec3(intensity), textureColor.rgb, strength);
+      textureColor = vec4(saturated, textureColor.a);
+  }
+  else if (effects == 4.0) {
+      // Invert
+      textureColor.rgb = vec3(1.0) - textureColor.rgb;
+  }
 
   float c = brightness / 100.0;
   vec3 adjustedColor = textureColor.xyz + c;
@@ -226,77 +237,77 @@ void main() {
 }`;
 
 function pushMatrix(stack, m) {
-  //necessary because javascript only does shallow push
-  var copy = mat4.create(m);
-  stack.push(copy);
+    //necessary because javascript only does shallow push
+    var copy = mat4.create(m);
+    stack.push(copy);
 }
 
 function popMatrix(stack) {
-  if (stack.length > 0) return stack.pop();
-  else console.log("stack has no matrix to pop!");
+    if (stack.length > 0) return stack.pop();
+    else console.log("stack has no matrix to pop!");
 }
 
 function vertexShaderSetup(vertexShaderCode) {
-  shader = gl.createShader(gl.VERTEX_SHADER);
-  gl.shaderSource(shader, vertexShaderCode);
-  gl.compileShader(shader);
-  // Error check whether the shader is compiled correctly
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    alert(gl.getShaderInfoLog(shader));
-    return null;
-  }
-  return shader;
+    shader = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(shader, vertexShaderCode);
+    gl.compileShader(shader);
+    // Error check whether the shader is compiled correctly
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        alert(gl.getShaderInfoLog(shader));
+        return null;
+    }
+    return shader;
 }
 
 function fragmentShaderSetup(fragShaderCode) {
-  shader = gl.createShader(gl.FRAGMENT_SHADER);
-  gl.shaderSource(shader, fragShaderCode);
-  gl.compileShader(shader);
-  // Error check whether the shader is compiled correctly
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    alert(gl.getShaderInfoLog(shader));
-    return null;
-  }
-  return shader;
+    shader = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(shader, fragShaderCode);
+    gl.compileShader(shader);
+    // Error check whether the shader is compiled correctly
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        alert(gl.getShaderInfoLog(shader));
+        return null;
+    }
+    return shader;
 }
 
 function initShaders() {
-  shaderProgram = gl.createProgram();
+    shaderProgram = gl.createProgram();
 
-  var vertexShader = vertexShaderSetup(vertexShaderCode);
-  var fragmentShader = fragmentShaderSetup(fragShaderCode);
+    var vertexShader = vertexShaderSetup(vertexShaderCode);
+    var fragmentShader = fragmentShaderSetup(fragShaderCode);
 
-  // attach the shaders
-  gl.attachShader(shaderProgram, vertexShader);
-  gl.attachShader(shaderProgram, fragmentShader);
-  //link the shader program
-  gl.linkProgram(shaderProgram);
+    // attach the shaders
+    gl.attachShader(shaderProgram, vertexShader);
+    gl.attachShader(shaderProgram, fragmentShader);
+    //link the shader program
+    gl.linkProgram(shaderProgram);
 
-  // check for compiiion and linking status
-  if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-    console.log(gl.getShaderInfoLog(vertexShader));
-    console.log(gl.getShaderInfoLog(fragmentShader));
-  }
+    // check for compiiion and linking status
+    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+        console.log(gl.getShaderInfoLog(vertexShader));
+        console.log(gl.getShaderInfoLog(fragmentShader));
+    }
 
-  //finally use the program.
-  gl.useProgram(shaderProgram);
+    //finally use the program.
+    gl.useProgram(shaderProgram);
 
-  return shaderProgram;
+    return shaderProgram;
 }
 
 function initGL(canvas) {
-  try {
-    gl = canvas.getContext("webgl2", { preserveDrawingBuffer: true }); // the graphics webgl2 context
-    gl.viewportWidth = canvas.width; // the width of the canvas
-    gl.viewportHeight = canvas.height; // the height
-  } catch (e) {}
-  if (!gl) {
-    alert("WebGL initialization failed");
-  }
+    try {
+        gl = canvas.getContext("webgl2", { preserveDrawingBuffer: true }); // the graphics webgl2 context
+        gl.viewportWidth = canvas.width; // the width of the canvas
+        gl.viewportHeight = canvas.height; // the height
+    } catch (e) {}
+    if (!gl) {
+        alert("WebGL initialization failed");
+    }
 }
 
 function degToRad(degrees) {
-  return (degrees * Math.PI) / 180;
+    return (degrees * Math.PI) / 180;
 }
 
 // New sphere initialization function
@@ -413,420 +424,477 @@ function degToRad(degrees) {
 // }
 
 function initSquareBuffer() {
-  const sqIndices = new Uint32Array([0, 1, 2, 0, 2, 3]);
-  sqVertexIndexBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, sqVertexIndexBuffer);
-  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, sqIndices, gl.STATIC_DRAW);
-  sqVertexIndexBuffer.itemSize = 1;
-  sqVertexIndexBuffer.numItems = 6;
+    const sqIndices = new Uint32Array([0, 1, 2, 0, 2, 3]);
+    sqVertexIndexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, sqVertexIndexBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, sqIndices, gl.STATIC_DRAW);
+    sqVertexIndexBuffer.itemSize = 1;
+    sqVertexIndexBuffer.numItems = 6;
 
-  const sqVertices = new Float32Array([
-    0.5, 0.5, 0.0, -0.5, 0.5, 0.0, -0.5, -0.5, 0.0, 0.5, -0.5, 0.0,
-  ]);
-  sqVertexPositionBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, sqVertexPositionBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, sqVertices, gl.STATIC_DRAW);
-  sqVertexPositionBuffer.itemSize = 3;
-  sqVertexPositionBuffer.numItems = 4;
+    const sqVertices = new Float32Array([
+        0.5, 0.5, 0.0, -0.5, 0.5, 0.0, -0.5, -0.5, 0.0, 0.5, -0.5, 0.0,
+    ]);
+    sqVertexPositionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, sqVertexPositionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, sqVertices, gl.STATIC_DRAW);
+    sqVertexPositionBuffer.itemSize = 3;
+    sqVertexPositionBuffer.numItems = 4;
 
-  // const sqNormal = new Float32Array([
-  //   0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0,
-  // ]);
-  // sqNormalBuffer = gl.createBuffer();
-  // gl.bindBuffer(gl.ARRAY_BUFFER, sqNormalBuffer);
-  // gl.bufferData(gl.ARRAY_BUFFER, sqNormal, gl.STATIC_DRAW);
-  // sqNormalBuffer.itemSize = 3;
-  // sqNormalBuffer.numItems = 4;
+    // const sqNormal = new Float32Array([
+    //   0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0,
+    // ]);
+    // sqNormalBuffer = gl.createBuffer();
+    // gl.bindBuffer(gl.ARRAY_BUFFER, sqNormalBuffer);
+    // gl.bufferData(gl.ARRAY_BUFFER, sqNormal, gl.STATIC_DRAW);
+    // sqNormalBuffer.itemSize = 3;
+    // sqNormalBuffer.numItems = 4;
 
-  const sqTexture = new Float32Array([1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0]);
-  sqTextureBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, sqTextureBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, sqTexture, gl.STATIC_DRAW);
-  sqTextureBuffer.itemSize = 2;
-  sqTextureBuffer.numItems = 4;
+    const sqTexture = new Float32Array([
+        1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0,
+    ]);
+    sqTextureBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, sqTextureBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, sqTexture, gl.STATIC_DRAW);
+    sqTextureBuffer.itemSize = 2;
+    sqTextureBuffer.numItems = 4;
 }
 
 function drawSquare(color) {
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, sqVertexIndexBuffer);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, sqVertexIndexBuffer);
 
-  gl.uniform4fv(uDiffuseTermLocation, color);
-  gl.uniformMatrix4fv(uMMatrixLocation, false, mMatrix);
-  gl.uniformMatrix4fv(uVMatrixLocation, false, vMatrix);
-  gl.uniformMatrix4fv(uPMatrixLocation, false, pMatrix);
-  gl.uniform1f(effectLocation, effects);
-  gl.uniform1f(effectLocation2, effects2);
-  gl.uniform1f(contrastLocation, contrast);
-  gl.uniform1f(brightnessLocation, brightness);
+    gl.uniform4fv(uDiffuseTermLocation, color);
+    gl.uniformMatrix4fv(uMMatrixLocation, false, mMatrix);
+    gl.uniformMatrix4fv(uVMatrixLocation, false, vMatrix);
+    gl.uniformMatrix4fv(uPMatrixLocation, false, pMatrix);
+    gl.uniform1f(effectLocation, effects);
+    gl.uniform1f(effectLocation2, effects2);
+    gl.uniform1f(contrastLocation, contrast);
+    gl.uniform1f(brightnessLocation, brightness);
 
-  // gl.uniform3fv(uEyePosLocation, eyePos);
+    // gl.uniform3fv(uEyePosLocation, eyePos);
 
-  // console.log(sqNormalBuffer.itemSize);
-  // gl.bindBuffer(gl.ARRAY_BUFFER, sqNormalBuffer);
-  // gl.vertexAttribPointer(
-  //   aNormalLocation,
-  //   sqNormalBuffer.itemSize,
-  //   gl.FLOAT,
-  //   false,
-  //   0,
-  //   0
-  // );
+    // console.log(sqNormalBuffer.itemSize);
+    // gl.bindBuffer(gl.ARRAY_BUFFER, sqNormalBuffer);
+    // gl.vertexAttribPointer(
+    //   aNormalLocation,
+    //   sqNormalBuffer.itemSize,
+    //   gl.FLOAT,
+    //   false,
+    //   0,
+    //   0
+    // );
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, sqTextureBuffer);
-  gl.vertexAttribPointer(
-    aTextureLocation,
-    sqTextureBuffer.itemSize,
-    gl.FLOAT,
-    false,
-    0,
-    0
-  );
+    gl.bindBuffer(gl.ARRAY_BUFFER, sqTextureBuffer);
+    gl.vertexAttribPointer(
+        aTextureLocation,
+        sqTextureBuffer.itemSize,
+        gl.FLOAT,
+        false,
+        0,
+        0
+    );
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, sqVertexPositionBuffer);
-  gl.vertexAttribPointer(
-    aPositionLocation,
-    sqVertexPositionBuffer.itemSize,
-    gl.FLOAT,
-    false,
-    0,
-    0
-  );
-  // gl.uniformMatrix4fv(uNormalLocation, false, nMatrix);
+    gl.bindBuffer(gl.ARRAY_BUFFER, sqVertexPositionBuffer);
+    gl.vertexAttribPointer(
+        aPositionLocation,
+        sqVertexPositionBuffer.itemSize,
+        gl.FLOAT,
+        false,
+        0,
+        0
+    );
+    // gl.uniformMatrix4fv(uNormalLocation, false, nMatrix);
 
-  var wnMatrix = mat4.transpose(mat4.inverse(mMatrix));
-  // gl.uniformMatrix4fv(uWNormalLocation, false, wnMatrix);
+    var wnMatrix = mat4.transpose(mat4.inverse(mMatrix));
+    // gl.uniformMatrix4fv(uWNormalLocation, false, wnMatrix);
 
-  gl.drawElements(
-    gl.TRIANGLES,
-    sqVertexIndexBuffer.numItems,
-    gl.UNSIGNED_INT,
-    0
-  );
+    gl.drawElements(
+        gl.TRIANGLES,
+        sqVertexIndexBuffer.numItems,
+        gl.UNSIGNED_INT,
+        0
+    );
 }
 
 function initTextures(texFile) {
-  var tex = gl.createTexture();
-  tex.image = new Image();
-  tex.image.src = texFile;
-  tex.image.onload = function () {
-    handleTextureLoaded(tex);
-  };
-  return tex;
+    var tex = gl.createTexture();
+    tex.image = new Image();
+    tex.image.src = texFile;
+    tex.image.onload = function () {
+        handleTextureLoaded(tex);
+    };
+    return tex;
 }
 
 function initTextureAlpha(foregroundTexture, backgroundTexture) {
-  const textureUnit = 0;
+    const textureUnit = 0;
 
-  var foregroundTexture = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, foregroundTexture);
-  gl.texImage2D(
-    gl.TEXTURE_2D,
-    0,
-    gl.RGBA,
-    gl.RGBA,
-    gl.UNSIGNED_BYTE,
-    foregroundImage
-  );
-  gl.generateMipmap(gl.TEXTURE_2D);
+    var foregroundTexture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, foregroundTexture);
+    gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        gl.RGBA,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        foregroundImage
+    );
+    gl.generateMipmap(gl.TEXTURE_2D);
 
-  var backgroundTexture = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, backgroundTexture);
-  gl.texImage2D(
-    gl.TEXTURE_2D,
-    0,
-    gl.RGBA,
-    gl.RGBA,
-    gl.UNSIGNED_BYTE,
-    backgroundImage
-  );
-  gl.generateMipmap(gl.TEXTURE_2D);
+    var backgroundTexture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, backgroundTexture);
+    gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        gl.RGBA,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        backgroundImage
+    );
+    gl.generateMipmap(gl.TEXTURE_2D);
 
-  gl.activeTexture(gl.TEXTURE0 + textureUnit);
-  gl.bindTexture(gl.TEXTURE_2D, foregroundTexture);
-  gl.uniform1i(foregroundTextureLocation, textureUnit);
+    gl.activeTexture(gl.TEXTURE0 + textureUnit);
+    gl.bindTexture(gl.TEXTURE_2D, foregroundTexture);
+    gl.uniform1i(foregroundTextureLocation, textureUnit);
 
-  gl.activeTexture(gl.TEXTURE0 + textureUnit + 1);
-  gl.bindTexture(gl.TEXTURE_2D, backgroundTexture);
-  gl.uniform1i(backgroundTextureLocation, textureUnit + 1);
+    gl.activeTexture(gl.TEXTURE0 + textureUnit + 1);
+    gl.bindTexture(gl.TEXTURE_2D, backgroundTexture);
+    gl.uniform1i(backgroundTextureLocation, textureUnit + 1);
 
-  gl.uniform1f(alphaLocation, 0.5);
+    gl.uniform1f(alphaLocation, 0.5);
 }
 
 function handleTextureLoaded(texture) {
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1); // use it to flip Y if needed
-  gl.texImage2D(
-    gl.TEXTURE_2D, // 2D texture
-    0, // mipmap level
-    gl.RGBA, // internal format
-    gl.RGBA, // format
-    gl.UNSIGNED_BYTE, // type of data
-    texture.image // array or <img>
-  );
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1); // use it to flip Y if needed
+    gl.texImage2D(
+        gl.TEXTURE_2D, // 2D texture
+        0, // mipmap level
+        gl.RGBA, // internal format
+        gl.RGBA, // format
+        gl.UNSIGNED_BYTE, // type of data
+        texture.image // array or <img>
+    );
 
-  gl.generateMipmap(gl.TEXTURE_2D);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  gl.texParameteri(
-    gl.TEXTURE_2D,
-    gl.TEXTURE_MIN_FILTER,
-    gl.LINEAR_MIPMAP_LINEAR
-  );
+    gl.generateMipmap(gl.TEXTURE_2D);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(
+        gl.TEXTURE_2D,
+        gl.TEXTURE_MIN_FILTER,
+        gl.LINEAR_MIPMAP_LINEAR
+    );
 
-  drawScene();
+    drawScene();
 }
 
 //////////////////////////////////////////////////////////////////////
 //The main drawing routine
 function drawScene() {
-  gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
-  gl.clearColor(0.992, 0.894, 0.949, 1.0);
-  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-  // gl.enable(gl.DEPTH_TEST);
+    // if (!backgroundTexture && !foregroundTexture) {
+    //   return;
+    // }
 
-  //set up the model matrix
-  mat4.identity(mMatrix);
+    gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+    gl.clearColor(1.0, 1.0, 1.0, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    // gl.enable(gl.DEPTH_TEST);
 
-  // set up the view matrix, multiply into the modelview matrix
-  mat4.identity(vMatrix);
-  vMatrix = mat4.lookAt(eyePos, [xCam, yCam, zCam], [0, 1, 0], vMatrix);
+    //set up the model matrix
+    mat4.identity(mMatrix);
 
-  //set up projection matrix
-  mat4.identity(pMatrix);
-  mat4.perspective(60, 1.0, 0.01, 1000, pMatrix);
+    // set up the view matrix, multiply into the modelview matrix
+    mat4.identity(vMatrix);
+    vMatrix = mat4.lookAt(eyePos, [xCam, yCam, zCam], [0, 1, 0], vMatrix);
 
-  pushMatrix(matrixStack, mMatrix);
-  color = [1.0, 1.0, 0.0, 1.0];
-  mMatrix = mat4.scale(mMatrix, [1.2, 1.2, 1.2]);
-  drawSquare(color);
-  mMatrix = popMatrix(matrixStack);
+    //set up projection matrix
+    mat4.identity(pMatrix);
+    mat4.perspective(60, 1.0, 0.01, 1000, pMatrix);
+
+    pushMatrix(matrixStack, mMatrix);
+    color = [1.0, 1.0, 1.0, 1.0];
+    mMatrix = mat4.scale(mMatrix, [1.2, 1.2, 1.2]);
+    drawSquare(color);
+    mMatrix = popMatrix(matrixStack);
 }
 
 // This is the entry point from the html
 
 var slider1;
 function sliderChanged1() {
-  contrast = parseFloat(slider1.value);
-  // console.log(contrast);
-  drawScene();
+    contrast = parseFloat(slider1.value);
+    // console.log(contrast);
+    drawScene();
 }
 
 var slider2;
 function sliderChanged2() {
-  brightness = parseFloat(slider2.value);
-  // console.log(brightness);
-  drawScene();
+    brightness = parseFloat(slider2.value);
+    // console.log(brightness);
+    drawScene();
 }
 
 function webGLStart() {
-  canvas = document.getElementById("assign4");
-  // document.addEventListener("mousedown", onMouseDown, false);
+    canvas = document.getElementById("assign4");
+    // document.addEventListener("mousedown", onMouseDown, false);
 
-  var backTex, foreTex;
-  initGL(canvas);
+    var backTex, foreTex;
+    initGL(canvas);
 
-  document
-    .getElementById("imageInput1")
-    .addEventListener("change", function (e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          // const image = new Image();
-          backgroundImage = e.target.result;
-          // backTex = initTextures(backgroundImage);
-          // if (imageVal == "A" || imageVal == "B") {
-          //   console.log(1);
-          //   backTex = initTextures(backgroundImage);
-          // }
+    document
+        .getElementById("imageInput1")
+        .addEventListener("change", function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    // const image = new Image();
+                    backgroundImage = e.target.result;
+                    // backTex = initTextures(backgroundImage);
+                    // if (imageVal == "A" || imageVal == "B") {
+                    //   console.log(1);
+                    //   backTex = initTextures(backgroundImage);
+                    // }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+    document
+        .getElementById("imageInput2")
+        .addEventListener("change", function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    // const image = new Image();
+                    foregroundImage = e.target.result;
+                    // foreTex = initTextures(foregroundImage);
+                    // if (imageVal == "B") {
+                    //   console.log(2);
+                    //   foreTex = initTextures(foregroundImage);
+                    //   // initTextureAlpha(foregroundImage, backgroundImage);
+                    // }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+    var radios1 = document.forms["formA"].elements["myradio"];
+    for (radio in radios1) {
+        radios1[radio].onclick = function () {
+            imageVal = this.value;
+            if (imageVal == "A") {
+                backTex = initTextures(backgroundImage);
+                console.log(3);
+                gl.activeTexture(gl.TEXTURE1); // Select the texture unit you want to change
+                gl.bindTexture(gl.TEXTURE_2D, backTex);
+                gl.activeTexture(gl.TEXTURE0);
+                gl.bindTexture(gl.TEXTURE_2D, backTex);
+                gl.uniform1i(backgroundTextureLocation, 0);
+
+                drawScene();
+                // initTextures(backgroundImage);
+            }
+            if (imageVal == "B") {
+                effects2 = 0.0;
+                var radios3 = document.forms["formC"].elements["myradio"];
+                for (radio in radios3) {
+                    radios3[radio].checked = false;
+                }
+                console.log(4);
+                backTex = initTextures(backgroundImage);
+                gl.activeTexture(gl.TEXTURE0);
+                gl.bindTexture(gl.TEXTURE_2D, backTex);
+                gl.uniform1i(backgroundTextureLocation, 0);
+
+                foreTex = initTextures(foregroundImage);
+                gl.activeTexture(gl.TEXTURE1);
+                gl.bindTexture(gl.TEXTURE_2D, foreTex);
+                gl.uniform1i(foregroundTextureLocation, 1);
+
+                drawScene();
+                // initTextureAlpha(foregroundImage, backgroundImage);
+            }
         };
-        reader.readAsDataURL(file);
-      }
-    });
+    }
 
-  document
-    .getElementById("imageInput2")
-    .addEventListener("change", function (e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          // const image = new Image();
-          foregroundImage = e.target.result;
-          // foreTex = initTextures(foregroundImage);
-          // if (imageVal == "B") {
-          //   console.log(2);
-          //   foreTex = initTextures(foregroundImage);
-          //   // initTextureAlpha(foregroundImage, backgroundImage);
-          // }
+    var radios2 = document.forms["formB"].elements["myradio"];
+    for (radio in radios2) {
+        radios2[radio].onclick = function () {
+            effects = parseFloat(this.value);
+            // console.log(effects);
+            drawScene();
         };
-        reader.readAsDataURL(file);
-      }
-    });
+    }
 
-  var radios1 = document.forms["formA"].elements["myradio"];
-  for (radio in radios1) {
-    radios1[radio].onclick = function () {
-      imageVal = this.value;
-      if (imageVal == "A") {
-        backTex = initTextures(backgroundImage);
-        console.log(3);
-        gl.activeTexture(gl.TEXTURE1); // Select the texture unit you want to change
-        gl.bindTexture(gl.TEXTURE_2D, backTex);
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, backTex);
-        gl.uniform1i(backgroundTextureLocation, 0);
-
+    const element = document.getElementById("myBtn");
+    element.addEventListener("click", function () {
+        effects = 0.0;
+        var radios2 = document.forms["formB"].elements["myradio"];
+        for (radio in radios2) {
+            radios2[radio].checked = false;
+        }
         drawScene();
-        // initTextures(backgroundImage);
-      }
-      if (imageVal == "B") {
+    });
+
+    slider1 = document.getElementById("myRange1");
+    slider1.addEventListener("input", sliderChanged1);
+
+    slider2 = document.getElementById("myRange2");
+    slider2.addEventListener("input", sliderChanged2);
+
+    var radios3 = document.forms["formC"].elements["myradio"];
+    for (radio in radios3) {
+        radios3[radio].onclick = function () {
+            effects2 = parseFloat(this.value);
+            console.log(effects2);
+            drawScene();
+        };
+    }
+
+    const element2 = document.getElementById("myBtn2");
+    element2.addEventListener("click", function () {
         effects2 = 0.0;
         var radios3 = document.forms["formC"].elements["myradio"];
         for (radio in radios3) {
-          radios3[radio].checked = false;
+            radios3[radio].checked = false;
         }
-        console.log(4);
-        backTex = initTextures(backgroundImage);
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, backTex);
-        gl.uniform1i(backgroundTextureLocation, 0);
+        drawScene();
+    });
 
-        foreTex = initTextures(foregroundImage);
-        gl.activeTexture(gl.TEXTURE1);
-        gl.bindTexture(gl.TEXTURE_2D, foreTex);
-        gl.uniform1i(foregroundTextureLocation, 1);
+    document.querySelector("#downloadSample").addEventListener("click", () => {
+        const a = document.createElement("a");
+        a.href = "sample_textures.zip"; // your asset path
+        a.download = "sample_textures.zip"; // optional, sets filename
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    });
+
+    const reset = document.getElementById("reset");
+    // Add a click event listener
+    reset.addEventListener("click", function () {
+        effects = 0.0;
+        effects2 = 0.0;
+        slider1.value = -50.0;
+        contrast = -50.0;
+        slider2.value = 0.0;
+        brightness = 0.0;
+
+        var radios2 = document.forms["formB"].elements["myradio"];
+        for (radio in radios2) {
+            radios2[radio].checked = false;
+        }
+        var radios3 = document.forms["formC"].elements["myradio"];
+        for (radio in radios3) {
+            radios3[radio].checked = false;
+        }
 
         drawScene();
-        // initTextureAlpha(foregroundImage, backgroundImage);
-      }
-    };
-  }
-
-  var radios2 = document.forms["formB"].elements["myradio"];
-  for (radio in radios2) {
-    radios2[radio].onclick = function () {
-      effects = parseFloat(this.value);
-      // console.log(effects);
-      drawScene();
-    };
-  }
-
-  const element = document.getElementById("myBtn");
-  element.addEventListener("click", function () {
-    effects = 0.0;
-    var radios2 = document.forms["formB"].elements["myradio"];
-    for (radio in radios2) {
-      radios2[radio].checked = false;
-    }
-    drawScene();
-  });
-
-  slider1 = document.getElementById("myRange1");
-  slider1.addEventListener("input", sliderChanged1);
-
-  slider2 = document.getElementById("myRange2");
-  slider2.addEventListener("input", sliderChanged2);
-
-  var radios3 = document.forms["formC"].elements["myradio"];
-  for (radio in radios3) {
-    radios3[radio].onclick = function () {
-      effects2 = parseFloat(this.value);
-      console.log(effects2);
-      drawScene();
-    };
-  }
-
-  const element2 = document.getElementById("myBtn2");
-  element2.addEventListener("click", function () {
-    effects2 = 0.0;
-    var radios3 = document.forms["formC"].elements["myradio"];
-    for (radio in radios3) {
-      radios3[radio].checked = false;
-    }
-    drawScene();
-  });
-
-  const reset = document.getElementById("reset");
-
-  // Add a click event listener
-  reset.addEventListener("click", function () {
-    effects = 0.0;
-    effects2 = 0.0;
-    slider1.value = -50.0;
-    contrast = -50.0;
-    slider2.value = 0.0;
-    brightness = 0.0;
-
-    var radios2 = document.forms["formB"].elements["myradio"];
-    for (radio in radios2) {
-      radios2[radio].checked = false;
-    }
-    var radios3 = document.forms["formC"].elements["myradio"];
-    for (radio in radios3) {
-      radios3[radio].checked = false;
-    }
-
-    drawScene();
-  });
-
-  const elem = document.querySelector("#save");
-  elem.addEventListener("click", () => {
-    // drawScene();
-    canvas.toBlob((blob) => {
-      saveBlob(blob, `processed_output.png`);
     });
-  });
 
-  const saveBlob = (function () {
-    const a = document.createElement("a");
-    document.body.appendChild(a);
-    a.style.display = "none";
-    return function saveData(blob, fileName) {
-      const url = window.URL.createObjectURL(blob);
-      a.href = url;
-      a.download = fileName;
-      a.click();
-    };
-  })();
+    // document.getElementById("reset-images").addEventListener("click", function () {
 
-  shaderProgram = initShaders();
+    //   // imageVal = "";
+    //   document.getElementById("imageInput1").value = "";
+    //   document.getElementById("imageInput2").value = "";
 
-  //get locations of attributes declared in the vertex shader
-  aPositionLocation = gl.getAttribLocation(shaderProgram, "aPosition");
-  // aNormalLocation = gl.getAttribLocation(shaderProgram, "aNormal");
-  aTextureLocation = gl.getAttribLocation(shaderProgram, "aTexCoords");
+    //   backgroundImage = null;
+    //   foregroundImage = null;
+    //   // const reader = new FileReader();
+    //   // reader.onload = function (e) {
+    //   //   // const image = new Image();
+    //   //   // backTex = initTextures(backgroundImage);
+    //   //   // if (imageVal == "A" || imageVal == "B") {
+    //   //   //   console.log(1);
+    //   //   //   backTex = initTextures(backgroundImage);
+    //   //   // }
+    //   // };
+    //   // reader.readAsDataURL(file);
+    //   // matrixStack = [];
 
-  uMMatrixLocation = gl.getUniformLocation(shaderProgram, "uMMatrix");
-  uPMatrixLocation = gl.getUniformLocation(shaderProgram, "uPMatrix");
-  uVMatrixLocation = gl.getUniformLocation(shaderProgram, "uVMatrix");
-  // uNormalLocation = gl.getUniformLocation(shaderProgram, "uNMatrix");
-  // uWNormalLocation = gl.getUniformLocation(shaderProgram, "uWNMatrix");
-  uDiffuseTermLocation = gl.getUniformLocation(shaderProgram, "objColor");
+    //   const canvas = document.getElementById("assign4");
+    //   const gl = canvas.getContext("webgl"); // or "experimental-webgl"
 
-  //texture location in shader
-  foregroundTextureLocation = gl.getUniformLocation(
-    shaderProgram,
-    "uForegroundTexture"
-  );
-  backgroundTextureLocation = gl.getUniformLocation(
-    shaderProgram,
-    "uBackgroundTexture"
-  );
-  alphaLocation = gl.getUniformLocation(shaderProgram, "uAlpha");
+    //   if (backgroundTexture) {
+    //     gl.deleteTexture(backgroundTexture);
+    //     backgroundTexture = null;
+    //   }
 
-  effectLocation = gl.getUniformLocation(shaderProgram, "effects");
-  effectLocation2 = gl.getUniformLocation(shaderProgram, "effects2");
-  contrastLocation = gl.getUniformLocation(shaderProgram, "contrast");
-  brightnessLocation = gl.getUniformLocation(shaderProgram, "brightness");
+    //   if (foregroundTexture) {
+    //     gl.deleteTexture(foregroundTexture);
+    //     foregroundTexture = null;
+    //   }
 
-  //enable the attribute arrays
-  gl.enableVertexAttribArray(aPositionLocation);
-  // gl.enableVertexAttribArray(aNormalLocation);
-  gl.enableVertexAttribArray(aTextureLocation);
+    //   // resetImageTextures(gl);
+    //   // Clear the canvas to black or any color
+    //   gl.clearColor(0.0, 0.0, 0.0, 1.0); // RGBA
+    //   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    //   // backgroundTexture = null;
+    //   // foregroundTexture = null;
+    //   drawScene();
+    // });
 
-  //initialize buffers for the square
-  initSquareBuffer();
-  // initSphereBuffer();
-  // sampleTexture = initTextures(foregroundImage);
+    const elem = document.querySelector("#save");
+    elem.addEventListener("click", () => {
+        // drawScene();
+        canvas.toBlob((blob) => {
+            saveBlob(blob, `processed_output.png`);
+        });
+    });
 
-  drawScene();
+    const saveBlob = (function () {
+        const a = document.createElement("a");
+        document.body.appendChild(a);
+        a.style.display = "none";
+        return function saveData(blob, fileName) {
+            const url = window.URL.createObjectURL(blob);
+            a.href = url;
+            a.download = fileName;
+            a.click();
+        };
+    })();
+
+    shaderProgram = initShaders();
+
+    //get locations of attributes declared in the vertex shader
+    aPositionLocation = gl.getAttribLocation(shaderProgram, "aPosition");
+    // aNormalLocation = gl.getAttribLocation(shaderProgram, "aNormal");
+    aTextureLocation = gl.getAttribLocation(shaderProgram, "aTexCoords");
+
+    uMMatrixLocation = gl.getUniformLocation(shaderProgram, "uMMatrix");
+    uPMatrixLocation = gl.getUniformLocation(shaderProgram, "uPMatrix");
+    uVMatrixLocation = gl.getUniformLocation(shaderProgram, "uVMatrix");
+    // uNormalLocation = gl.getUniformLocation(shaderProgram, "uNMatrix");
+    // uWNormalLocation = gl.getUniformLocation(shaderProgram, "uWNMatrix");
+    uDiffuseTermLocation = gl.getUniformLocation(shaderProgram, "objColor");
+
+    //texture location in shader
+    foregroundTextureLocation = gl.getUniformLocation(
+        shaderProgram,
+        "uForegroundTexture"
+    );
+    backgroundTextureLocation = gl.getUniformLocation(
+        shaderProgram,
+        "uBackgroundTexture"
+    );
+    alphaLocation = gl.getUniformLocation(shaderProgram, "uAlpha");
+
+    effectLocation = gl.getUniformLocation(shaderProgram, "effects");
+    effectLocation2 = gl.getUniformLocation(shaderProgram, "effects2");
+    contrastLocation = gl.getUniformLocation(shaderProgram, "contrast");
+    brightnessLocation = gl.getUniformLocation(shaderProgram, "brightness");
+
+    //enable the attribute arrays
+    gl.enableVertexAttribArray(aPositionLocation);
+    // gl.enableVertexAttribArray(aNormalLocation);
+    gl.enableVertexAttribArray(aTextureLocation);
+
+    //initialize buffers for the square
+    initSquareBuffer();
+    // initSphereBuffer();
+    // sampleTexture = initTextures(foregroundImage);
+
+    drawScene();
 }
